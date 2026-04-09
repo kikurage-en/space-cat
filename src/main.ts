@@ -377,10 +377,101 @@ flipBtn.addEventListener('click', () => {
   scheduleRender()
 })
 
-// --- 未使用変数の一時的な参照（Phase 6で使用） ---
-void saveBtn
-void shareBtn
-void tweetBtn
-void hashtagEl
-void resetBtn
-void toast
+// --- トースト ---
+let toastTimer = 0
+
+function showToast(message: string) {
+  toast.textContent = message
+  toast.classList.remove('hidden')
+  clearTimeout(toastTimer)
+  toastTimer = window.setTimeout(() => {
+    toast.classList.add('hidden')
+  }, 2000)
+}
+
+// --- Canvas→Blob ---
+function canvasToBlob(): Promise<Blob> {
+  return new Promise((resolve, reject) => {
+    canvas.toBlob((blob) => {
+      if (blob) resolve(blob)
+      else reject(new Error('Canvas toBlob failed'))
+    }, 'image/png')
+  })
+}
+
+// --- タッチデバイス判定 ---
+const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0
+
+// --- 保存 ---
+saveBtn.addEventListener('click', async () => {
+  try {
+    const blob = await canvasToBlob()
+    const file = new File([blob], 'space-cat.png', { type: 'image/png' })
+
+    if (isTouchDevice && navigator.share && navigator.canShare?.({ files: [file] })) {
+      await navigator.share({ files: [file] })
+    } else {
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = 'space-cat.png'
+      a.click()
+      URL.revokeObjectURL(url)
+      showToast('保存しました')
+    }
+  } catch (e) {
+    if (e instanceof Error && e.name !== 'AbortError') {
+      showToast('保存に失敗しました')
+    }
+  }
+})
+
+// --- シェア ---
+shareBtn.addEventListener('click', async () => {
+  try {
+    const blob = await canvasToBlob()
+    const file = new File([blob], 'space-cat.png', { type: 'image/png' })
+
+    if (navigator.share && navigator.canShare?.({ files: [file] })) {
+      await navigator.share({
+        text: '宇宙猫を作ったよ! #SpaceCat',
+        files: [file],
+      })
+    } else {
+      await navigator.clipboard.write([
+        new ClipboardItem({ 'image/png': blob }),
+      ])
+      showToast('画像をコピーしました')
+    }
+  } catch (e) {
+    if (e instanceof Error && e.name !== 'AbortError') {
+      showToast('シェアに失敗しました')
+    }
+  }
+})
+
+// --- Xポスト ---
+tweetBtn.addEventListener('click', () => {
+  const text = encodeURIComponent('宇宙猫を作ったよ! #SpaceCat')
+  window.open(`https://x.com/intent/post?text=${text}`, '_blank')
+})
+
+// --- ハッシュタグコピー ---
+hashtagEl.addEventListener('click', async () => {
+  try {
+    await navigator.clipboard.writeText('#SpaceCat')
+    showToast('#SpaceCat をコピーしました')
+  } catch {
+    showToast('コピーに失敗しました')
+  }
+})
+
+// --- リセット ---
+resetBtn.addEventListener('click', () => {
+  if (!confirm('最初からやり直しますか?')) return
+  subjectImg = null
+  resetSubjectState()
+  fileInput.value = ''
+  ctx.clearRect(0, 0, canvas.width, canvas.height)
+  showSection('upload')
+})
