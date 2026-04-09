@@ -138,9 +138,74 @@ function handleProcessingError(e: unknown) {
   }
 }
 
-// --- 描画（Phase 4で実装） ---
+// --- 背景画像プリロード ---
+const BG_IDS = ['galaxy', 'nebula', 'deep-space', 'planet']
+
+function loadBgImage(id: string): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    img.onload = () => resolve(img)
+    img.onerror = reject
+    img.src = `${import.meta.env.BASE_URL}bg/${id}.webp`
+  })
+}
+
+async function preloadBackgrounds() {
+  const entries = await Promise.all(
+    BG_IDS.map(async (id) => {
+      const img = await loadBgImage(id)
+      return [id, img] as const
+    })
+  )
+  for (const [id, img] of entries) {
+    bgImages.set(id, img)
+  }
+}
+
+preloadBackgrounds()
+
+// --- Canvas描画 ---
+let renderPending = false
+
 function scheduleRender() {
-  console.log('scheduleRender called')
+  if (renderPending) return
+  renderPending = true
+  requestAnimationFrame(() => {
+    renderPending = false
+    renderResult()
+  })
+}
+
+function renderResult() {
+  if (!subjectImg) return
+
+  const bgImg = bgImages.get(currentBgId)
+
+  // 背景描画
+  if (bgImg) {
+    const bgScale = Math.max(canvas.width / bgImg.width, canvas.height / bgImg.height)
+    const bw = bgImg.width * bgScale
+    const bh = bgImg.height * bgScale
+    ctx.drawImage(bgImg, (canvas.width - bw) / 2, (canvas.height - bh) / 2, bw, bh)
+  } else {
+    ctx.fillStyle = '#0a0a1a'
+    ctx.fillRect(0, 0, canvas.width, canvas.height)
+  }
+
+  // 被写体描画
+  const fitScale = Math.min(canvas.width / subjectImg.width, canvas.height / subjectImg.height)
+  const drawScale = fitScale * subjectScale
+  const dw = subjectImg.width * drawScale
+  const dh = subjectImg.height * drawScale
+  const cx = subjectX * canvas.width
+  const cy = subjectY * canvas.height
+
+  ctx.save()
+  ctx.translate(cx, cy)
+  ctx.rotate((subjectRotation * Math.PI) / 180)
+  if (subjectFlipped) ctx.scale(-1, 1)
+  ctx.drawImage(subjectImg, -dw / 2, -dh / 2, dw, dh)
+  ctx.restore()
 }
 
 // --- ドラッグガイド ---
@@ -182,8 +247,19 @@ uploadArea.addEventListener('drop', (e) => {
   if (file) handleFile(file)
 })
 
+// 背景選択
+const bgThumbs = document.querySelectorAll<HTMLImageElement>('.bg-thumb')
+bgThumbs.forEach((thumb) => {
+  thumb.addEventListener('click', () => {
+    const id = thumb.dataset.bg
+    if (!id) return
+    currentBgId = id
+    bgThumbs.forEach((t) => t.classList.toggle('active', t === thumb))
+    scheduleRender()
+  })
+})
+
 // --- 未使用変数の一時的な参照（Phase後半で使用） ---
-void ctx
 void flipBtn
 void saveBtn
 void shareBtn
@@ -191,11 +267,3 @@ void tweetBtn
 void hashtagEl
 void resetBtn
 void toast
-void currentBgId
-void bgImages
-void subjectImg
-void subjectX
-void subjectY
-void subjectScale
-void subjectRotation
-void subjectFlipped
