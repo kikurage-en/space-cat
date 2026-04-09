@@ -259,8 +259,125 @@ bgThumbs.forEach((thumb) => {
   })
 })
 
-// --- 未使用変数の一時的な参照（Phase後半で使用） ---
-void flipBtn
+// --- マウスドラッグ ---
+let dragging = false
+
+function hideDragGuide() {
+  dragGuide.classList.add('fade-out')
+  setTimeout(() => dragGuide.classList.add('hidden'), 600)
+}
+
+function canvasToNormalized(clientX: number, clientY: number) {
+  const rect = canvas.getBoundingClientRect()
+  return {
+    x: (clientX - rect.left) / rect.width,
+    y: (clientY - rect.top) / rect.height,
+  }
+}
+
+canvas.addEventListener('mousedown', (e) => {
+  dragging = true
+  const pos = canvasToNormalized(e.clientX, e.clientY)
+  subjectX = pos.x
+  subjectY = pos.y
+  hideDragGuide()
+  scheduleRender()
+})
+
+window.addEventListener('mousemove', (e) => {
+  if (!dragging) return
+  const pos = canvasToNormalized(e.clientX, e.clientY)
+  subjectX = pos.x
+  subjectY = pos.y
+  scheduleRender()
+})
+
+window.addEventListener('mouseup', () => {
+  dragging = false
+})
+
+// --- タッチドラッグ + ピンチ ---
+let lastTouchDist = 0
+let lastTouchAngle = 0
+
+canvas.addEventListener('touchstart', (e) => {
+  e.preventDefault()
+  hideDragGuide()
+  if (e.touches.length === 1) {
+    dragging = true
+    const pos = canvasToNormalized(e.touches[0].clientX, e.touches[0].clientY)
+    subjectX = pos.x
+    subjectY = pos.y
+    scheduleRender()
+  } else if (e.touches.length === 2) {
+    dragging = false
+    const dx = e.touches[1].clientX - e.touches[0].clientX
+    const dy = e.touches[1].clientY - e.touches[0].clientY
+    lastTouchDist = Math.hypot(dx, dy)
+    lastTouchAngle = Math.atan2(dy, dx)
+  }
+}, { passive: false })
+
+canvas.addEventListener('touchmove', (e) => {
+  e.preventDefault()
+  if (e.touches.length === 1 && dragging) {
+    const pos = canvasToNormalized(e.touches[0].clientX, e.touches[0].clientY)
+    subjectX = pos.x
+    subjectY = pos.y
+    scheduleRender()
+  } else if (e.touches.length === 2) {
+    const dx = e.touches[1].clientX - e.touches[0].clientX
+    const dy = e.touches[1].clientY - e.touches[0].clientY
+    const dist = Math.hypot(dx, dy)
+    const angle = Math.atan2(dy, dx)
+
+    if (lastTouchDist > 0) {
+      subjectScale *= dist / lastTouchDist
+      subjectScale = Math.max(0.05, Math.min(3, subjectScale))
+      scaleSlider.value = String(subjectScale)
+    }
+    if (lastTouchAngle !== 0) {
+      const delta = ((angle - lastTouchAngle) * 180) / Math.PI
+      subjectRotation += delta
+      subjectRotation = ((subjectRotation + 180) % 360 + 360) % 360 - 180
+      rotationSlider.value = String(Math.round(subjectRotation))
+    }
+
+    lastTouchDist = dist
+    lastTouchAngle = angle
+    scheduleRender()
+  }
+}, { passive: false })
+
+canvas.addEventListener('touchend', (e) => {
+  e.preventDefault()
+  if (e.touches.length < 2) {
+    lastTouchDist = 0
+    lastTouchAngle = 0
+  }
+  if (e.touches.length === 0) {
+    dragging = false
+  }
+}, { passive: false })
+
+// --- スライダー ---
+scaleSlider.addEventListener('input', () => {
+  subjectScale = parseFloat(scaleSlider.value)
+  scheduleRender()
+})
+
+rotationSlider.addEventListener('input', () => {
+  subjectRotation = parseFloat(rotationSlider.value)
+  scheduleRender()
+})
+
+// --- 反転 ---
+flipBtn.addEventListener('click', () => {
+  subjectFlipped = !subjectFlipped
+  scheduleRender()
+})
+
+// --- 未使用変数の一時的な参照（Phase 6で使用） ---
 void saveBtn
 void shareBtn
 void tweetBtn
