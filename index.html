@@ -2,10 +2,101 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Space Cat</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Space Cat - 宇宙猫ジェネレーター</title>
+  <meta name="description" content="動物写真の背景を宇宙に変換!ブラウザで完結、画像はサーバーに送信されません。">
+
+  <!-- OGP -->
+  <meta property="og:title" content="Space Cat - 宇宙猫ジェネレーター">
+  <meta property="og:description" content="動物写真の背景を宇宙に変換!ブラウザで完結、画像はサーバーに送信されません。">
+  <meta property="og:image" content="sample.webp">
+  <meta property="og:type" content="website">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Space Cat - 宇宙猫ジェネレーター">
+  <meta name="twitter:description" content="動物写真の背景を宇宙に変換!ブラウザで完結、画像はサーバーに送信されません。">
+  <meta name="twitter:image" content="sample.webp">
+
+  <link rel="stylesheet" href="/src/style.css">
 </head>
 <body>
+  <div class="container">
+    <header>
+      <h1>Space Cat</h1>
+      <p class="subtitle">動物写真を宇宙に送ろう</p>
+    </header>
+
+    <!-- アップロードセクション -->
+    <section id="upload-section">
+      <div id="upload-area" class="upload-area">
+        <div class="upload-icon">📷</div>
+        <p class="upload-text">写真をドラッグ&ドロップ<br>またはタップして選択</p>
+        <p class="upload-hint">画像はサーバーに送信されません</p>
+      </div>
+      <input type="file" id="file-input" accept="image/*" hidden>
+    </section>
+
+    <!-- 処理中セクション -->
+    <section id="processing-section" class="hidden">
+      <div class="processing-content">
+        <div class="spinner"></div>
+        <p id="processing-status" class="processing-status">背景を除去中...</p>
+      </div>
+    </section>
+
+    <!-- 結果セクション -->
+    <section id="result-section" class="hidden">
+      <div class="canvas-wrapper">
+        <canvas id="result-canvas" width="1024" height="1024"></canvas>
+        <div id="drag-guide" class="drag-guide hidden">
+          <span>ドラッグで移動</span>
+        </div>
+      </div>
+
+      <!-- 背景セレクター -->
+      <div class="bg-selector">
+        <img class="bg-thumb active" data-bg="galaxy" src="bg-thumb/galaxy.webp" alt="銀河">
+        <img class="bg-thumb" data-bg="nebula" src="bg-thumb/nebula.webp" alt="星雲">
+        <img class="bg-thumb" data-bg="deep-space" src="bg-thumb/deep-space.webp" alt="深宇宙">
+        <img class="bg-thumb" data-bg="planet" src="bg-thumb/planet.webp" alt="惑星">
+      </div>
+
+      <!-- コントロール -->
+      <div class="controls">
+        <div class="control-row">
+          <label class="control-label">サイズ</label>
+          <input type="range" id="scale-slider" class="slider" min="0.05" max="3" step="0.05" value="0.7">
+        </div>
+        <div class="control-row">
+          <label class="control-label">回転</label>
+          <input type="range" id="rotation-slider" class="slider" min="-180" max="180" step="1" value="0">
+        </div>
+        <div class="control-row">
+          <button id="flip-btn" class="btn-icon">↔ 反転</button>
+        </div>
+      </div>
+
+      <!-- アクションボタン -->
+      <div class="actions">
+        <button id="save-btn" class="btn btn-primary">💾 保存</button>
+        <button id="share-btn" class="btn btn-share">📤 シェア</button>
+        <button id="tweet-btn" class="btn btn-tweet">𝕏 ポスト</button>
+      </div>
+      <div class="actions-sub">
+        <span id="hashtag" class="hashtag">#SpaceCat</span>
+        <button id="reset-btn" class="btn-icon">🔄 リセット</button>
+      </div>
+    </section>
+
+    <footer>
+      <p>画像はすべてブラウザ内で処理されます。サーバーには送信されません。</p>
+    </footer>
+  </div>
+
+  <!-- トースト -->
+  <div id="toast" class="toast hidden"></div>
+
   <script type="module" src="/src/main.ts"></script>
 </body>
 </html>
