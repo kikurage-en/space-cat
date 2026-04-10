@@ -14,13 +14,8 @@
 - **単一エントリポイント**: src/main.ts が全機能を担当
 
 ## 技術スタック
-| 要素 | 技術 | バージョン |
-|------|------|-----------|
-| ビルド | Vite | ^8.0.4 |
-| 言語 | TypeScript | ~6.0.2 (target: es2023) |
-| 背景除去 | @imgly/background-removal | ^1.7.0 |
-| 画像合成 | Canvas API | ブラウザ標準 |
-| ホスティング | GitHub Pages | - |
+Vite + TypeScript + @imgly/background-removal、GitHub Pages でホスティング。
+バージョン・詳細: @.claude/references/environment-spec.md
 
 ## ライセンス
 **AGPL-3.0-only**（@imgly/background-removal がAGPLのため、ソースコード公開が必要）
@@ -54,10 +49,8 @@ pnpm preview    # ビルドプレビュー
 `ontouchstart` / `maxTouchPoints` でタッチ判定、Web Share API でモバイル対応
 
 ## デザインシステム
-- ダークテーマ: 背景 `#0a0a1a`（深い宇宙）、テキスト `#fff`
-- アクセント: `#9b59b6`（パープル） → `#00d4ff`（シアン） グラデーション
-- モバイルファースト: `max-width: 480px`、`safe-area-inset` 対応
-- ハッシュタグ: `#SpaceCat`
+ダークテーマ（宇宙モチーフ）、パープル→シアンのグラデーション、モバイルファースト。
+詳細: @.claude/references/style-guide.md
 
 ## デプロイ
 - GitHub Actions で main ブランチ push 時に自動デプロイ
@@ -72,6 +65,7 @@ pnpm preview    # ビルドプレビュー
 ## ルール（詳細）
 @.claude/rules/development-workflow.md
 @.claude/rules/security-guidelines.md
+@.claude/rules/doc-consistency.md
 
 ## 参照ドキュメント
 @.claude/references/environment-spec.md
