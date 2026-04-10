@@ -457,7 +457,7 @@ shareBtn.addEventListener('click', async () => {
 
 // --- Xポスト ---
 tweetBtn.addEventListener('click', () => {
-  const text = encodeURIComponent('宇宙猫を作ったよ! #SpaceCat')
+  const text = encodeURIComponent('宇宙にきたよ🪐 #SpaceCat\nhttps://kikurage-en.github.io/space-cat/')
   window.open(`https://x.com/intent/post?text=${text}`, '_blank')
 })
 
