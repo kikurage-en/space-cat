@@ -64,15 +64,11 @@ function resizeImage(img: HTMLImageElement, maxSize: number): Blob {
   const offCtx = offscreen.getContext('2d')!
   offCtx.drawImage(img, 0, 0, w, h)
 
-  let blob: Blob | null = null
-  offscreen.toBlob((b) => { blob = b }, 'image/png')
-  // toBlob is async — use synchronous toDataURL fallback
   const dataUrl = offscreen.toDataURL('image/png')
   const bin = atob(dataUrl.split(',')[1])
   const arr = new Uint8Array(bin.length)
   for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i)
-  blob = new Blob([arr], { type: 'image/png' })
-  return blob
+  return new Blob([arr], { type: 'image/png' })
 }
 
 // --- 背景除去 ---
@@ -85,14 +81,7 @@ async function processImage(img: HTMLImageElement) {
   for (const size of SIZES) {
     try {
       const blob = resizeImage(img, size)
-      const resultBlob = await removeBackground(blob, {
-        progress(key, current, total) {
-          if (key === 'compute:inference') {
-            const pct = Math.round((current / total) * 100)
-            processingStatus.textContent = `処理中... ${pct}%`
-          }
-        },
-      })
+      const resultBlob = await removeBackground(blob)
 
       // Blob→Image変換
       const url = URL.createObjectURL(resultBlob)
@@ -136,6 +125,19 @@ function handleProcessingError(e: unknown) {
   } else {
     processingStatus.textContent = `エラーが発生しました: ${msg}`
   }
+  // スピナーを非表示にし、タップで戻れるようにする
+  const spinner = processingSection.querySelector('.spinner') as HTMLElement | null
+  if (spinner) spinner.style.display = 'none'
+  const retryMsg = document.createElement('p')
+  retryMsg.textContent = 'タップしてやり直す'
+  retryMsg.style.cssText = 'color: #00d4ff; cursor: pointer; margin-top: 16px;'
+  processingStatus.after(retryMsg)
+  retryMsg.addEventListener('click', () => {
+    retryMsg.remove()
+    if (spinner) spinner.style.display = ''
+    fileInput.value = ''
+    showSection('upload')
+  }, { once: true })
 }
 
 // --- 背景画像プリロード ---
@@ -151,14 +153,17 @@ function loadBgImage(id: string): Promise<HTMLImageElement> {
 }
 
 async function preloadBackgrounds() {
-  const entries = await Promise.all(
+  const results = await Promise.allSettled(
     BG_IDS.map(async (id) => {
       const img = await loadBgImage(id)
       return [id, img] as const
     })
   )
-  for (const [id, img] of entries) {
-    bgImages.set(id, img)
+  for (const result of results) {
+    if (result.status === 'fulfilled') {
+      const [id, img] = result.value
+      bgImages.set(id, img)
+    }
   }
 }
 

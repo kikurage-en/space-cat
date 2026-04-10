@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Space Cat - 宇宙猫ジェネレーター</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐱</text></svg>">
   <meta name="description" content="動物写真の背景を宇宙に変換!ブラウザで完結、画像はサーバーに送信されません。">
 
   <!-- OGP -->
@@ -23,7 +24,7 @@
 <body>
   <div class="container">
     <header>
-      <h1>Space Cat</h1>
+      <h1><span class="title-emoji">🪐</span> <span class="title-text">Space Cat</span></h1>
       <p class="subtitle">動物写真を宇宙に送ろう</p>
     </header>
 
@@ -72,8 +73,9 @@
           <label class="control-label">回転</label>
           <input type="range" id="rotation-slider" class="slider" min="-180" max="180" step="1" value="0">
         </div>
-        <div class="control-row">
+        <div class="control-row control-row-buttons">
           <button id="flip-btn" class="btn-icon">↔ 反転</button>
+          <button id="reset-btn" class="btn-icon">🔄 リセット</button>
         </div>
       </div>
 
@@ -85,13 +87,25 @@
       </div>
       <div class="actions-sub">
         <span id="hashtag" class="hashtag">#SpaceCat</span>
-        <button id="reset-btn" class="btn-icon">🔄 リセット</button>
       </div>
     </section>
 
     <footer>
-      <p>画像はすべてブラウザ内で処理されます。サーバーには送信されません。</p>
+      <p class="privacy-note">画像はすべてブラウザ内で処理されます。サーバーには送信されません。</p>
+      <div class="credits">
+        <div class="credit-section">
+          <span class="credit-label">INSPIRATION FROM</span>
+          <div class="tweet-embed">
+            <blockquote class="twitter-tweet" data-theme="dark" data-conversation="none"><p lang="ja" dir="ltr">キュピーンってなってる動物の画像を簡単に作れるWebサイト作った<a href="https://t.co/RgKCEz61H8">https://t.co/RgKCEz61H8</a></p>&mdash; 電電猫猫/ Naoki (@nya3_neko2) <a href="https://twitter.com/nya3_neko2/status/2041378200773877849?ref_src=twsrc%5Etfw">April 7, 2026</a></blockquote>
+          </div>
+        </div>
+        <div class="credit-section">
+          <span class="credit-label">CREATED BY</span>
+          <a href="https://x.com/Kikurage_En" target="_blank" rel="noopener noreferrer" class="credit-link">@Kikurage_En</a>
+        </div>
+      </div>
     </footer>
+    <script async src="https://platform.twitter.com/widgets.js" crossorigin="anonymous"></script>
   </div>
 
   <!-- トースト -->
