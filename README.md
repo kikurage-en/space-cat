@@ -1,6 +1,10 @@
-# 🌌 SpaceCat
+# 🪐 SpaceCat
 
 動物写真の背景を除去し、銀河・星雲の宇宙背景と合成して「宇宙猫」ミーム画像を生成するブラウザ完結型Webアプリ。
+
+**[▶ ライブデモ](https://kikurage-en.github.io/space-cat/)**
+
+![SpaceCat プレビュー](https://raw.githubusercontent.com/kikurage-en/space-cat/main/public/ogp.jpg)
 
 ## 特徴
 
@@ -29,7 +33,7 @@ pnpm install
 pnpm dev
 ```
 
-ブラウザで `http://localhost:5173` を開く。
+ターミナルに表示されるURLをブラウザで開く。
 
 ## 使い方
 
@@ -45,8 +49,10 @@ pnpm dev
 ```
 space-cat/
 ├── public/
-│   ├── bg.webp / bg.png           # 宇宙背景画像（銀河/星雲）
-│   └── sample.webp / sample.png   # サンプル画像（OGP用）
+│   ├── bg/                        # 宇宙背景画像（galaxy/nebula/deep-space/planet）
+│   ├── bg-thumb/                  # 背景サムネイル
+│   ├── ogp.jpg                    # OGP / Twitterカード画像
+│   └── sample.webp / sample.png   # 初期画面サンプル画像
 ├── src/
 │   ├── main.ts                    # エントリポイント（全ロジック）
 │   └── style.css                  # スタイルシート
@@ -69,7 +75,7 @@ space-cat/
 │   └── settings.json
 ├── CLAUDE.md
 ├── README.md
-└── .wizard-log.md
+└── LICENSE
 ```
 
 ## デプロイ（GitHub Pages）

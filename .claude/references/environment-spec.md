@@ -107,8 +107,11 @@
 | bg-thumb/nebula.webp | サムネイル: 星雲 | WebP |
 | bg-thumb/deep-space.webp | サムネイル: 深宇宙 | WebP |
 | bg-thumb/planet.webp | サムネイル: 惑星 | WebP |
-| sample.webp | サンプル画像・OGP画像 | WebP |
-| sample.png | サンプル画像（フォールバック） | PNG |
+| ogp.jpg | OGP / Twitterカード画像 | JPEG |
+| ogp.png | OGP画像（元データ） | PNG |
+| ogp.webp | OGP画像（WebP版） | WebP |
+| sample.webp | 初期画面サンプル画像 | WebP |
+| sample.png | 初期画面サンプル画像（フォールバック） | PNG |
 
 ## GitHub Pages 設定
 

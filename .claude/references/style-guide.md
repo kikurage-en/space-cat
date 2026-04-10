@@ -21,8 +21,7 @@
 | アクセントグラデーション | `linear-gradient(135deg, #9b59b6, #00d4ff)` | --gradient-accent |
 | ボーダー | `#333` | --color-border |
 | ボタン背景（薄い） | `rgba(255, 255, 255, 0.08)` | --color-btn-ghost |
-| シェアボタン | `linear-gradient(135deg, #00b4d8, #0077b6)` | --gradient-share |
-| 保存ボタン | `linear-gradient(135deg, #9b59b6, #00d4ff)` | --gradient-primary |
+| ボタン（共通） | `linear-gradient(135deg, #9b59b6, #00d4ff)` | --gradient-primary |
 | オーバーレイ | `rgba(0, 0, 0, 0.7)` | --color-overlay |
 
 ### タイポグラフィ
@@ -95,8 +94,8 @@ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 .bg-thumb {
-  width: 64px;
-  height: 48px;
+  width: 56px;
+  height: 56px;
   border-radius: 8px;
   object-fit: cover;
   cursor: pointer;

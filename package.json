@@ -2,7 +2,13 @@
   "name": "space-cat",
   "private": true,
   "version": "1.0.0",
+  "description": "動物写真の背景を除去し、宇宙背景と合成して「宇宙猫」ミーム画像を生成するブラウザ完結型Webアプリ",
   "license": "AGPL-3.0-only",
+  "homepage": "https://kikurage-en.github.io/space-cat/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kikurage-en/space-cat.git"
+  },
   "type": "module",
   "scripts": {
     "dev": "vite",
