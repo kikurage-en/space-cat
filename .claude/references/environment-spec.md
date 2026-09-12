@@ -105,8 +105,6 @@
 | ogp.png | OGP画像（元データ） | PNG |
 | ogp.webp | OGP画像（WebP版） | WebP |
 | sample-result.webp | 生成サンプル画像（フッターに表示、800x800） | WebP |
-| sample.webp | 未参照（index.html から使用されていない） | WebP |
-| sample.png | 未参照（index.html から使用されていない） | PNG |
 
 ### 背景画像
 
@@ -115,8 +113,10 @@
 
 | 項目 | 内容 |
 |------|------|
-| 本体解像度 | 1920x1920（正方形センタークロップ） |
+| 本体解像度 | 1920x1920（短辺センタークロップ後にリサイズ） |
 | サムネ解像度 | 128x128 |
+| WebP品質 | quality 78〜90 / method 6（1枚あたり 70〜620KB を目安に画像ごとに調整） |
+| 再生成時の注意 | WebPからの再圧縮は世代劣化するため、必ずNASAの原本から作り直す |
 | 出典 | NASA Image and Video Library（`images-api.nasa.gov`） |
 | ライセンス | NASA制作コンテンツはパブリックドメイン。個別クレジットは `BACKGROUNDS` に保持し、UI上に表示する |
 | 読み込み方式 | サムネのみ先行、本体は選択時にオンデマンド取得 |

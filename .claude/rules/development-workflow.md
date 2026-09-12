@@ -41,7 +41,7 @@
 ### デプロイ前チェックリスト
 - [ ] `pnpm build` がエラーなしで完了するか
 - [ ] `pnpm preview` でビルド結果が正しく表示されるか
-- [ ] 静的ファイル（bg/*.webp, bg-thumb/*.webp, sample.webp/png）がビルド後も正常か
+- [ ] 静的ファイル（bg/*.webp, bg-thumb/*.webp, sample-result.webp）がビルド後も正常か
 - [ ] OGP/Twitterカード設定が正しいか
 
 ## コーディング規約
