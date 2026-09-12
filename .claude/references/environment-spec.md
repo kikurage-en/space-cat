@@ -99,19 +99,26 @@
 
 | ファイル | 用途 | 形式 |
 |---------|------|------|
-| bg/galaxy.webp | 渦巻銀河（デフォルト背景） | WebP |
-| bg/nebula.webp | カラフルな星雲 | WebP |
-| bg/deep-space.webp | 暗い星空・天の川 | WebP |
-| bg/planet.webp | 惑星の近景 | WebP |
-| bg-thumb/galaxy.webp | サムネイル: 銀河 | WebP |
-| bg-thumb/nebula.webp | サムネイル: 星雲 | WebP |
-| bg-thumb/deep-space.webp | サムネイル: 深宇宙 | WebP |
-| bg-thumb/planet.webp | サムネイル: 惑星 | WebP |
+| bg/*.webp | 宇宙背景 本体 12枚（1920x1920） | WebP |
+| bg-thumb/*.webp | 背景サムネイル 12枚（128x128） | WebP |
 | ogp.jpg | OGP / Twitterカード画像 | JPEG |
 | ogp.png | OGP画像（元データ） | PNG |
 | ogp.webp | OGP画像（WebP版） | WebP |
 | sample.webp | 初期画面サンプル画像 | WebP |
 | sample.png | 初期画面サンプル画像（フォールバック） | PNG |
+
+### 背景画像
+
+ファイル名（id）とクレジットの一覧は `src/main.ts` の `BACKGROUNDS` 配列を参照。
+`bg/<id>.webp` と `bg-thumb/<id>.webp` が id ごとに対になる。
+
+| 項目 | 内容 |
+|------|------|
+| 本体解像度 | 1920x1920（正方形センタークロップ） |
+| サムネ解像度 | 128x128 |
+| 出典 | NASA Image and Video Library（`images-api.nasa.gov`） |
+| ライセンス | NASA制作コンテンツはパブリックドメイン。個別クレジットは `BACKGROUNDS` に保持し、UI上に表示する |
+| 読み込み方式 | サムネのみ先行、本体は選択時にオンデマンド取得 |
 
 ## GitHub Pages 設定
 

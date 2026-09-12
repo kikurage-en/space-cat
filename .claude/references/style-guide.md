@@ -33,6 +33,7 @@
 | ボタン | 14px | 600 | 各ボタンによる |
 | ヒントテキスト | 11px | 通常 | #555 |
 | フッター | 12px | 通常 | #555 |
+| 背景クレジット | 11px | 通常 | #555 |
 | トースト | 14px | 600 | #1a1a2e（背景: 白） |
 
 ### フォントファミリー
@@ -61,6 +62,7 @@ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 | drag-guide-bounce | ドラッグガイド上下 | 1.2s ease-in-out infinite、translateY(-6px) |
 | drag-guide-fade-in | ガイド出現 | 0.4s ease-out |
 | drag-guide-fade-out | ガイド消失 | 0.6s ease-out forwards |
+| bg-thumb-pulse | 背景読み込み中のサムネ点滅 | 1s ease-in-out infinite、opacity 0.4↔1 |
 | ボタン押下 | scale(0.95) | transition 0.2s |
 | アップロードエリア押下 | scale(0.98) | transition 0.2s |
 
@@ -85,12 +87,26 @@ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
 ### 背景セレクター（`.bg-selector`）
 
+サムネイルDOMは `src/main.ts` の `BACKGROUNDS` から動的生成される（HTMLには空のコンテナのみ）。
+
 ```css
 .bg-selector {
   display: flex;
   gap: 8px;
-  overflow-x: auto;          /* 横スクロール（将来の背景追加に備える） */
+  overflow-x: auto;          /* 横スクロール（12枚が並ぶ） */
   -webkit-overflow-scrolling: touch;
+  margin-bottom: 6px;
+  padding: 4px 0 6px;
+}
+
+/* 背景が増えたときにスクロール可能であることを示す */
+.bg-selector::-webkit-scrollbar {
+  height: 3px;
+}
+
+.bg-selector::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 2px;
 }
 
 .bg-thumb {
@@ -102,6 +118,7 @@ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   border: 2px solid transparent;
   opacity: 0.6;
   transition: all 0.2s;
+  flex-shrink: 0;            /* 横スクロール時に潰さない */
 }
 
 .bg-thumb.active {
@@ -111,6 +128,19 @@ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
 .bg-thumb:active {
   transform: scale(0.92);
+}
+
+/* 選択された背景の読み込み中 */
+.bg-thumb.loading {
+  animation: bg-thumb-pulse 1s ease-in-out infinite;
+}
+
+/* 選択中の背景のクレジット表記（空でも高さを保持しレイアウトを固定） */
+.bg-credit {
+  font-size: 11px;
+  color: #555;
+  min-height: 14px;
+  margin-bottom: 16px;
 }
 ```
 

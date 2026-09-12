@@ -32,12 +32,17 @@ pnpm preview    # ビルドプレビュー
 ### 画像処理フロー
 1. アップロード → リサイズ（1024→768→512px メモリフォールバック）
 2. `removeBackground()` でAI背景除去
-3. 4種類の宇宙背景（galaxy/nebula/deep-space/planet）からUI選択
+3. 12種類の宇宙背景からUI選択（横スクロールのサムネイル）
 4. Canvas上で選択背景 + 被写体を合成
 5. PNG出力（Web Share API / ダウンロード / クリップボード）
 
 ### 背景管理
-4枚をプリロードし `Map<string, HTMLImageElement>` で保持。`currentBgId` で選択中を管理。
+背景の定義（id / ラベル / クレジット）は `src/main.ts` の `BACKGROUNDS` 配列が SSOT。
+サムネイルDOMはこの配列から動的生成されるため、背景の追加・削除は配列の編集だけで完結する。
+
+本体画像は全件プリロードせず、**選択されたものだけを `ensureBgLoaded()` でオンデマンド取得**し
+`Map<string, HTMLImageElement>` にキャッシュする（初期ロードは先頭の1枚のみ）。
+`currentBgId` で選択中を管理。
 
 ### 被写体の状態管理
 正規化座標(0-1)で管理: `subjectX`, `subjectY`, `subjectScale`, `subjectRotation`, `subjectFlipped`

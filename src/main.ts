@@ -20,6 +20,31 @@ const tweetBtn = document.getElementById('tweet-btn')!
 const hashtagEl = document.getElementById('hashtag')!
 const resetBtn = document.getElementById('reset-btn')!
 const toast = document.getElementById('toast')!
+const bgSelector = document.getElementById('bg-selector')!
+const bgCredit = document.getElementById('bg-credit')!
+
+// --- 背景定義 ---
+// 背景の追加・削除はこの配列のみで完結する（サムネイルDOMは動的生成される）
+interface BgDef {
+  id: string
+  label: string
+  credit: string
+}
+
+const BACKGROUNDS: BgDef[] = [
+  { id: 'galaxy', label: '銀河', credit: '' },
+  { id: 'barred-spiral', label: '棒渦巻銀河 NGC 1300', credit: 'NASA, ESA, The Hubble Heritage Team (STScI/AURA)' },
+  { id: 'pinwheel', label: '回転花火銀河 M101', credit: 'NASA/JPL-Caltech/ESA/STScI/CXC' },
+  { id: 'sombrero', label: 'ソンブレロ銀河', credit: 'NASA/JPL-Caltech' },
+  { id: 'galaxy-cluster', label: '銀河団', credit: 'NASA, ESA/Hubble' },
+  { id: 'nebula', label: '星雲', credit: '' },
+  { id: 'starburst', label: '星団', credit: 'NASA, ESA/Hubble' },
+  { id: 'deep-space', label: '深宇宙', credit: '' },
+  { id: 'planet', label: '木星', credit: '' },
+  { id: 'saturn', label: '土星', credit: 'NASA/JPL/Space Science Institute' },
+  { id: 'earth', label: '地球', credit: 'NASA Goddard Space Flight Center' },
+  { id: 'aurora', label: 'オーロラ', credit: 'NASA / ISS Expedition 72' },
+]
 
 // --- 状態変数 ---
 let subjectImg: HTMLImageElement | null = null
@@ -28,8 +53,9 @@ let subjectY = 0.7
 let subjectScale = 0.7
 let subjectRotation = 0
 let subjectFlipped = false
-let currentBgId = 'galaxy'
+let currentBgId = BACKGROUNDS[0].id
 const bgImages = new Map<string, HTMLImageElement>()
+const bgLoading = new Map<string, Promise<HTMLImageElement>>()
 
 // --- セクション表示切替 ---
 function showSection(section: 'upload' | 'processing' | 'result') {
@@ -140,8 +166,7 @@ function handleProcessingError(e: unknown) {
   }, { once: true })
 }
 
-// --- 背景画像プリロード ---
-const BG_IDS = ['galaxy', 'nebula', 'deep-space', 'planet']
+// --- 背景画像の読み込み ---
 
 function loadBgImage(id: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
@@ -152,22 +177,33 @@ function loadBgImage(id: string): Promise<HTMLImageElement> {
   })
 }
 
-async function preloadBackgrounds() {
-  const results = await Promise.allSettled(
-    BG_IDS.map(async (id) => {
-      const img = await loadBgImage(id)
-      return [id, img] as const
-    })
-  )
-  for (const result of results) {
-    if (result.status === 'fulfilled') {
-      const [id, img] = result.value
+// 選択された背景だけをオンデマンドで読み込む。
+// 同一IDへの多重リクエストは進行中のPromiseを共有する
+function ensureBgLoaded(id: string): Promise<HTMLImageElement> {
+  const loaded = bgImages.get(id)
+  if (loaded) return Promise.resolve(loaded)
+
+  const inflight = bgLoading.get(id)
+  if (inflight) return inflight
+
+  const promise = loadBgImage(id)
+    .then((img) => {
       bgImages.set(id, img)
-    }
-  }
+      bgLoading.delete(id)
+      return img
+    })
+    .catch((e) => {
+      bgLoading.delete(id)
+      throw e
+    })
+  bgLoading.set(id, promise)
+  return promise
 }
 
-preloadBackgrounds()
+// 初期背景のみ先読み（残りは選択時に読み込む）
+ensureBgLoaded(currentBgId)
+  .then(() => scheduleRender())
+  .catch(() => {})
 
 // --- Canvas描画 ---
 let renderPending = false
@@ -252,17 +288,48 @@ uploadArea.addEventListener('drop', (e) => {
   if (file) handleFile(file)
 })
 
-// 背景選択
-const bgThumbs = document.querySelectorAll<HTMLImageElement>('.bg-thumb')
-bgThumbs.forEach((thumb) => {
-  thumb.addEventListener('click', () => {
-    const id = thumb.dataset.bg
-    if (!id) return
-    currentBgId = id
-    bgThumbs.forEach((t) => t.classList.toggle('active', t === thumb))
+// 背景選択（サムネイルはBACKGROUNDSから生成）
+function selectBackground(def: BgDef, thumb: HTMLImageElement) {
+  currentBgId = def.id
+  for (const t of bgSelector.querySelectorAll<HTMLImageElement>('.bg-thumb')) {
+    t.classList.toggle('active', t === thumb)
+  }
+  bgCredit.textContent = def.credit
+
+  if (bgImages.has(def.id)) {
     scheduleRender()
-  })
-})
+    return
+  }
+
+  // 未読み込みの背景は取得完了後に再描画する
+  thumb.classList.add('loading')
+  ensureBgLoaded(def.id)
+    .then(() => {
+      thumb.classList.remove('loading')
+      if (currentBgId === def.id) scheduleRender()
+    })
+    .catch(() => {
+      thumb.classList.remove('loading')
+      if (currentBgId === def.id) showToast('背景の読み込みに失敗しました')
+    })
+}
+
+for (const def of BACKGROUNDS) {
+  const thumb = document.createElement('img')
+  thumb.className = 'bg-thumb'
+  thumb.dataset.bg = def.id
+  thumb.src = `${import.meta.env.BASE_URL}bg-thumb/${def.id}.webp`
+  thumb.alt = def.label
+  thumb.title = def.label
+  thumb.loading = 'lazy'
+  thumb.decoding = 'async'
+  if (def.id === currentBgId) {
+    thumb.classList.add('active')
+    bgCredit.textContent = def.credit
+  }
+  thumb.addEventListener('click', () => selectBackground(def, thumb))
+  bgSelector.appendChild(thumb)
+}
 
 // --- マウスドラッグ ---
 let dragging = false
