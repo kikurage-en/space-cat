@@ -104,8 +104,9 @@
 | ogp.jpg | OGP / Twitterカード画像 | JPEG |
 | ogp.png | OGP画像（元データ） | PNG |
 | ogp.webp | OGP画像（WebP版） | WebP |
-| sample.webp | 初期画面サンプル画像 | WebP |
-| sample.png | 初期画面サンプル画像（フォールバック） | PNG |
+| sample-result.webp | 生成サンプル画像（フッターに表示、800x800） | WebP |
+| sample.webp | 未参照（index.html から使用されていない） | WebP |
+| sample.png | 未参照（index.html から使用されていない） | PNG |
 
 ### 背景画像
 

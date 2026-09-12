@@ -52,7 +52,8 @@ space-cat/
 │   ├── bg/                        # 宇宙背景画像 12枚（NASA提供）
 │   ├── bg-thumb/                  # 背景サムネイル
 │   ├── ogp.jpg                    # OGP / Twitterカード画像
-│   └── sample.webp / sample.png   # 初期画面サンプル画像
+│   ├── sample-result.webp         # 生成サンプル画像（フッター表示）
+│   └── sample.webp / sample.png   # 未参照
 ├── src/
 │   ├── main.ts                    # エントリポイント（全ロジック）
 │   └── style.css                  # スタイルシート
