@@ -10,6 +10,8 @@ const fileInput = document.getElementById('file-input') as HTMLInputElement
 const processingStatus = document.getElementById('processing-status')!
 const canvas = document.getElementById('result-canvas') as HTMLCanvasElement
 const ctx = canvas.getContext('2d')!
+const canvasWrapper = document.getElementById('canvas-wrapper')!
+const ratioSelector = document.getElementById('ratio-selector')!
 const dragGuide = document.getElementById('drag-guide')!
 const scaleSlider = document.getElementById('scale-slider') as HTMLInputElement
 const rotationSlider = document.getElementById('rotation-slider') as HTMLInputElement
@@ -44,6 +46,24 @@ const BACKGROUNDS: BgDef[] = [
   { id: 'saturn', label: '土星', credit: 'NASA/JPL/Space Science Institute' },
   { id: 'earth', label: '地球', credit: 'NASA Goddard Space Flight Center' },
   { id: 'aurora', label: 'オーロラ', credit: 'NASA / ISS Expedition 72' },
+]
+
+// --- 画角定義 ---
+// 画角の追加・削除はこの配列のみで完結する（ボタンDOMは動的生成される）
+// 短辺を1080pxで固定しているため、画角を変えても被写体の見かけの大きさは変わらない。
+// また背景原本(1920x1920)がどの画角でも等倍以下で収まるため、拡大による劣化が起きない
+interface RatioDef {
+  id: string
+  label: string
+  hint: string
+  width: number
+  height: number
+}
+
+const RATIOS: RatioDef[] = [
+  { id: 'square', label: '正方形', hint: '1:1 (1080x1080) — Instagram投稿', width: 1080, height: 1080 },
+  { id: 'landscape', label: '横長', hint: '16:9 (1920x1080) — X / YouTube', width: 1920, height: 1080 },
+  { id: 'portrait', label: '縦長', hint: '9:16 (1080x1920) — Instagramストーリー', width: 1080, height: 1920 },
 ]
 
 // --- 状態変数 ---
@@ -234,7 +254,9 @@ function renderResult() {
   }
 
   // 被写体描画
-  const fitScale = Math.min(canvas.width / subjectImg.width, canvas.height / subjectImg.height)
+  // 短辺を基準にスケールする（全画角で短辺は同じなので、画角を切り替えても大きさが変わらない）
+  const refEdge = Math.min(canvas.width, canvas.height)
+  const fitScale = refEdge / Math.max(subjectImg.width, subjectImg.height)
   const drawScale = fitScale * subjectScale
   const dw = subjectImg.width * drawScale
   const dh = subjectImg.height * drawScale
@@ -287,6 +309,40 @@ uploadArea.addEventListener('drop', (e) => {
   const file = e.dataTransfer?.files[0]
   if (file) handleFile(file)
 })
+
+// 画角選択（ボタンはRATIOSから生成）
+const RATIO_ICON_BOX = 20
+
+function applyRatio(def: RatioDef) {
+  canvas.width = def.width
+  canvas.height = def.height
+  // プレビューの表示比。CSS側で width: min(100%, 縦方向の上限 * ar) に使う
+  canvasWrapper.style.setProperty('--canvas-ar', String(def.width / def.height))
+  for (const b of ratioSelector.querySelectorAll<HTMLButtonElement>('.ratio-btn')) {
+    b.classList.toggle('active', b.dataset.ratio === def.id)
+  }
+  scheduleRender()
+}
+
+for (const def of RATIOS) {
+  const btn = document.createElement('button')
+  btn.className = 'ratio-btn'
+  btn.dataset.ratio = def.id
+  btn.title = def.hint
+  // アイコンは実際の比率どおりの枠を描く（20pxの箱に収める）
+  const ar = def.width / def.height
+  const icon = document.createElement('span')
+  icon.className = 'ratio-icon'
+  icon.style.width = `${ar >= 1 ? RATIO_ICON_BOX : RATIO_ICON_BOX * ar}px`
+  icon.style.height = `${ar >= 1 ? RATIO_ICON_BOX / ar : RATIO_ICON_BOX}px`
+  const label = document.createElement('span')
+  label.textContent = def.label
+  btn.append(icon, label)
+  btn.addEventListener('click', () => applyRatio(def))
+  ratioSelector.appendChild(btn)
+}
+
+applyRatio(RATIOS[0])
 
 // 背景選択（サムネイルはBACKGROUNDSから生成）
 function selectBackground(def: BgDef, thumb: HTMLImageElement) {

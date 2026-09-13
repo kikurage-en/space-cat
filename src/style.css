@@ -122,14 +122,55 @@ h1 {
   color: #888;
 }
 
+/* Ratio Selector */
+.ratio-selector {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.ratio-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 56px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 2px solid transparent;
+  border-radius: 10px;
+  font-size: 12px;
+  color: #888;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.ratio-btn.active {
+  border-color: #00d4ff;
+  color: #fff;
+}
+
+.ratio-btn:active {
+  transform: scale(0.95);
+}
+
+/* 枠のサイズは src/main.ts が RATIOS の比率から算出して指定する */
+.ratio-icon {
+  border: 1.5px solid currentColor;
+  border-radius: 2px;
+}
+
 /* Canvas */
+/* --canvas-ar（横/縦）は src/main.ts の applyRatio が設定する。
+   縦長でプレビューが画面を超えないよう、高さ60vhを上限に幅を決める */
 .canvas-wrapper {
   position: relative;
-  width: 100%;
-  aspect-ratio: 1;
+  width: min(100%, calc(60vh * var(--canvas-ar, 1)));
+  aspect-ratio: var(--canvas-ar, 1);
   border-radius: 16px;
   overflow: hidden;
-  margin-bottom: 16px;
+  margin: 0 auto 16px;
 }
 
 #result-canvas {

@@ -31,6 +31,7 @@
 | h1（タイトル） | 22px | 700 | グラデーション（purple→cyan） |
 | サブタイトル | 13px | 通常 | #888 |
 | ボタン | 14px | 600 | 各ボタンによる |
+| 画角ボタン | 12px | 通常 | #888（選択中: #fff） |
 | ヒントテキスト | 11px | 通常 | #555 |
 | フッター | 12px | 通常 | #555 |
 | 背景クレジット | 11px | 通常 | #555 |
@@ -53,6 +54,8 @@ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 | ボーダー半径（カード） | 16px |
 | ボーダー半径（ボタン） | 10px |
 | ボタン高さ | 44px（タップターゲット推奨サイズ） |
+| 画角ボタン高さ | 56px（アイコン+ラベルの2段） |
+| プレビュー高さ上限 | 60vh |
 
 ### アニメーション
 
@@ -72,6 +75,7 @@ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 |------|--------|----------|
 | アップロードエリア | border-color: #9b59b6, bg: rgba(9b59b6, 0.05) | scale(0.98) |
 | ボタン（共通） | - | scale(0.95) |
+| 画角ボタン | - | scale(0.95)、選択中は border-color: #00d4ff |
 | アイコンボタン | - | scale(0.92), bg: rgba(fff, 0.15) |
 | ハッシュタグ | - | color: #00d4ff |
 
@@ -82,8 +86,70 @@ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 | 対象 | ルール | 例 |
 |------|--------|-----|
 | CSSクラス | kebab-case | `.upload-area`, `.preview-section`, `.btn-primary` |
-| id | kebab-case | `#result-canvas`, `#file-input` |
+| id | kebab-case | `#result-canvas`, `#file-input`, `#ratio-selector` |
 | BEM風の修飾子 | `-修飾子` | `.btn-tweet`, `.btn-share`, `.btn-primary` |
+
+### 画角セレクター（`.ratio-selector`）
+
+ボタンDOMは `src/main.ts` の `RATIOS` から動的生成される（HTMLには空のコンテナのみ）。
+`.ratio-icon` の幅・高さは比率から算出して20pxの箱に収めるため、JS側でインライン指定する。
+
+```css
+.ratio-selector {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.ratio-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 56px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 2px solid transparent;
+  border-radius: 10px;
+  font-size: 12px;
+  color: #888;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.ratio-btn.active {
+  border-color: #00d4ff;     /* アクセントカラー */
+  color: #fff;
+}
+
+.ratio-btn:active {
+  transform: scale(0.95);
+}
+
+/* 枠のサイズは src/main.ts が RATIOS の比率から算出して指定する */
+.ratio-icon {
+  border: 1.5px solid currentColor;
+  border-radius: 2px;
+}
+```
+
+### キャンバス枠（`.canvas-wrapper`）
+
+表示比は `applyRatio()` が設定するCSS変数 `--canvas-ar`（横/縦）で決まる。
+縦長のときにプレビューが画面を超えないよう、**高さ60vhを上限に幅を決める**。
+`aspect-ratio` + `max-height` では幅が縮まないため、`width: min()` 側で制御する。
+
+```css
+.canvas-wrapper {
+  position: relative;
+  width: min(100%, calc(60vh * var(--canvas-ar, 1)));
+  aspect-ratio: var(--canvas-ar, 1);
+  border-radius: 16px;
+  overflow: hidden;
+  margin: 0 auto 16px;
+}
+```
 
 ### 背景セレクター（`.bg-selector`）
 

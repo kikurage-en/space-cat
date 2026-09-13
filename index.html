@@ -53,8 +53,12 @@
 
     <!-- 結果セクション -->
     <section id="result-section" class="hidden">
-      <div class="canvas-wrapper">
-        <canvas id="result-canvas" width="1024" height="1024"></canvas>
+      <!-- 画角セレクター -->
+      <!-- ボタンは src/main.ts の RATIOS から生成 -->
+      <div class="ratio-selector" id="ratio-selector"></div>
+
+      <div class="canvas-wrapper" id="canvas-wrapper">
+        <canvas id="result-canvas" width="1080" height="1080"></canvas>
         <div id="drag-guide" class="drag-guide hidden">
           <span>ドラッグで移動</span>
         </div>
