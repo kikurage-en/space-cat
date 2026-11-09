@@ -4,3 +4,6 @@ dist/
 .env.*
 *.log
 .wizard-log.md
+
+# Claude Code: personal permission rules can contain approved commands verbatim
+.claude/settings.local.json
